@@ -13,7 +13,7 @@ This repository is a hands-on project inspired by the concepts from Designing Da
 
 ## 📖 Project Overview
 
-The project focuses on building an API that serves the holy verses of the **Sri Bhagavad Gita**. Although the functionality is simple, the application will be developed with production-quality standards to ensure it is:
+The project Gita IO focuses on building an API that serves the holy verses of the **Sri Bhagavad Gita**. Although the functionality is simple, the application will be developed with production-quality standards to ensure it is:
 
 Robust • Resilient • Reliable • Scalable
 
