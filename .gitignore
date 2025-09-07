@@ -1,0 +1,5 @@
+# VS Code files
+.vscode/*
+
+# .out files (example the output of unit tests with coverage)
+*.out

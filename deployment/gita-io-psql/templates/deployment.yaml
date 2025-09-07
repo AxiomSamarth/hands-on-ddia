@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "gita-io-psql.fullname" . }}
+  namespace: {{ .Values.postgresql.namespace }}
+  labels:
+    app: {{ include "gita-io-psql.name" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "gita-io-psql.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "gita-io-psql.name" . }}
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          ports:
+            - containerPort: {{ .Values.postgresql.port }}
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.postgresql.username | quote }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "gita-io-psql.fullname" . }}-secret
+                  key: postgres-password
+            - name: POSTGRES_DB
+              value: {{ .Values.postgresql.database | quote }}
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+            - name: initdb
+              mountPath: /docker-entrypoint-initdb.d/init-db.sql
+              subPath: init-db.sql
+            - name: init-shlokas
+              mountPath: /docker-entrypoint-initdb.d/init-shlokas.sql
+              subPath: init-shlokas.sql
+      volumes:
+        - name: pgdata
+          emptyDir: {}
+        - name: initdb
+          configMap:
+            name: {{ include "gita-io-psql.fullname" . }}-initdb
+        - name: init-shlokas
+          configMap:
+            name: gita-init-shlokas
