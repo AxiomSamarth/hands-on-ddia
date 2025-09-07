@@ -1,0 +1,11 @@
+appConfig:
+  host: localhost
+  namespace: gita-io
+  port: 9090
+dbConfig:
+  type: postgresql
+  postgreSqlConfig:
+    host: localhost
+    namespace: "" # set the namespace to "" for local/dev environment
+    port: 5432
+    dbName: gitadb
