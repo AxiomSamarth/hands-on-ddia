@@ -10,10 +10,15 @@ import (
 	usersvc "github.com/AxiomSamarth/hands-on-ddia/internal/dal/service/user"
 )
 
+var (
+	getDbConfig = config.GetDbConfig
+	newUserRepository = postgres.NewUserRepository
+)
+
 // NewUserService instantiates a new user service with the 
 // new user repository based on the configured database type. 
 func NewUserService() (usersvc.UserService, error) {
-	dbConfig, err := config.GetDbConfig()
+	dbConfig, err := getDbConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +27,7 @@ func NewUserService() (usersvc.UserService, error) {
 
 	switch dbConfig.Type {
 	case config.DbTypePostgres:
-		repo, err = postgres.NewUserRepository(dbConfig.PostgreSqlConfig)
+		repo, err = newUserRepository(dbConfig.PostgreSqlConfig)
 		if err != nil {
 			return nil, err
 		}

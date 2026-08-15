@@ -5,6 +5,7 @@ go 1.23
 toolchain go1.23.11
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/golang-jwt/jwt/v5 v5.2.3
 	github.com/gorilla/mux v1.8.1

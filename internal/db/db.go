@@ -9,19 +9,26 @@ import (
 	"github.com/AxiomSamarth/hands-on-ddia/internal/db/postgres"
 )
 
+var (
+	getDbConfig = config.GetDbConfig
+	initPostgres = postgres.Init
+	initMySQL = mysql.Init
+	initMongo = mongo.Init
+)
+
 func Init() error {
-	dbConfig, err := config.GetDbConfig()
+	dbConfig, err := getDbConfig()
 	if err != nil {
 		return err
 	}
 
 	switch dbConfig.Type {
 	case config.DbTypePostgres:
-		return postgres.Init()
+		return initPostgres()
 	case config.DbTypeMySql:
-		return mysql.Init()
+		return initMySQL()
 	case config.DbTypeMongoDb:
-		return mongo.Init()
+		return initMongo()
 	default:
 		return errors.New("unsupported database provider")
 	}

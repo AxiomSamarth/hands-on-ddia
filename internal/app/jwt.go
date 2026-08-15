@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -11,10 +12,14 @@ const (
 	jwtSecretKey = "JWT_SECRET_KEY"
 )
 
-var jwtSecret = []byte(os.Getenv(jwtSecretKey))
 var tokenTTL = time.Hour * 24
 
 func generateToken(emailId string) (string, error) {
+	jwtSecret, set := os.LookupEnv(jwtSecretKey)
+	if !set {
+		return "", fmt.Errorf("environment variable %s is not set", jwtSecretKey)
+	}
+
 	claims := jwt.MapClaims{
 		"sub": emailId,
 		"exp": time.Now().Add(tokenTTL).Unix(),
@@ -22,5 +27,5 @@ func generateToken(emailId string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtSecret)
+	return token.SignedString([]byte(jwtSecret))
 }

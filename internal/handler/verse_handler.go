@@ -14,6 +14,11 @@ import (
 	apperrors "github.com/AxiomSamarth/hands-on-ddia/internal/errors"
 )
 
+var (
+	getVerse = app.GetVerse
+	getAllVerses = app.GetAllVerses
+)
+
 // GetVerseHandler is the API handler for the GetVerse API endpoint.
 // It performs request validation & delegates the request to the application
 // layer to fetch the specific verse from the specified verse & chapter numbers.
@@ -22,7 +27,7 @@ func GetVerseHandler(w http.ResponseWriter, r *http.Request) {
 	chapterNumber, _ := strconv.Atoi(vars["chapter_number"])
 	verseNumber, _ := strconv.Atoi(vars["verse_number"])
 
-	result, status, err := app.GetVerse(chapterNumber, verseNumber)
+	result, status, err := getVerse(chapterNumber, verseNumber)
 	if err != nil {
 		logger.Log.Error("error fetching the verse from the chapter", zap.Error(err))
 		if status == http.StatusInternalServerError {
@@ -50,7 +55,7 @@ func GetVersesHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	chapterNumber, _ := strconv.Atoi(vars["chapter_number"])
 
-	result, status, err := app.GetAllVerses(chapterNumber)
+	result, status, err := getAllVerses(chapterNumber)
 	if err != nil {
 		logger.Log.Error("error fetching the verses from the chapter", zap.Error(err))
 		if status == http.StatusInternalServerError {

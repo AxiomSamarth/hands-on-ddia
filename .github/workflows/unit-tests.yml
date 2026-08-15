@@ -1,0 +1,66 @@
+name: Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  test-and-coverage:
+    runs-on: ubuntu-latest
+    env:
+      COVERAGE_THRESHOLD: "95"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Run unit tests
+        run: go test -coverprofile=coverage.out ./...
+
+      - name: Enforce coverage threshold
+        run: |
+          total_line="$(go tool cover -func=coverage.out | grep '^total:')"
+          total_coverage="$(echo "$total_line" | awk '{gsub(/%/, "", $3); print $3}')"
+          echo "Total coverage: ${total_coverage}%"
+          echo "TOTAL_COVERAGE=${total_coverage}" >> "$GITHUB_ENV"
+          awk -v coverage="$total_coverage" -v threshold="$COVERAGE_THRESHOLD" \
+            'BEGIN { if (coverage + 0 < threshold + 0) { exit 1 } }'
+          echo "Coverage check passed (>= ${COVERAGE_THRESHOLD}%)."
+
+      - name: Update coverage badge data
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          color="red"
+          awk -v c="$TOTAL_COVERAGE" 'BEGIN { if (c+0 >= 95) exit 0; exit 1 }' || color="orange"
+          awk -v c="$TOTAL_COVERAGE" 'BEGIN { if (c+0 >= 98) exit 0; exit 1 }' && color="brightgreen"
+          mkdir -p .github/badges
+          cat > .github/badges/coverage.json <<EOF
+          {
+            "schemaVersion": 1,
+            "label": "coverage",
+            "message": "${TOTAL_COVERAGE}%",
+            "color": "${color}"
+          }
+          EOF
+
+      - name: Commit coverage badge data
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          if git diff --quiet .github/badges/coverage.json; then
+            echo "No coverage badge changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/badges/coverage.json
+          git commit -m "chore(ci): update coverage badge data"
+          git push

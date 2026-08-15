@@ -18,6 +18,11 @@ import (
 
 var validate = validator.New()
 
+var (
+	loginUser = app.LoginUser
+	registerUser = app.RegisterUser
+)
+
 // LoginHandler is the API handler for the Login API endpoint.
 // It performs the request validation and delegates the request to the application
 // layer to log the user in, create session and return the user with a JWT.
@@ -38,7 +43,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	req.normalise()
 
-	token, status, err := app.LoginUser(req.EmailId, req.Password)
+	token, status, err := loginUser(req.EmailId, req.Password)
 	if err != nil {
 		switch status {
 		case http.StatusInternalServerError:
@@ -84,7 +89,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 
 	req.normalise()
 
-	status, err := app.RegisterUser(req.Name, req.EmailId, req.Password)
+	status, err := registerUser(req.Name, req.EmailId, req.Password)
 	if err != nil {
 		logger.Log.Error("Failed to register user",
 			zap.String("email", req.EmailId),

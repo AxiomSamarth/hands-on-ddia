@@ -3,3 +3,4 @@
 
 # .out files (example the output of unit tests with coverage)
 *.out
+*.html

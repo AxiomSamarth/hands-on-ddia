@@ -10,10 +10,15 @@ import (
 	verserepo "github.com/AxiomSamarth/hands-on-ddia/internal/dal/repository/verse"
 )
 
+var (
+	getDbConfigForVerse = config.GetDbConfig
+	newVerseRepository = postgres.NewVerseRepository
+)
+
 // NewVerseService instantiates a new verse service with the
 // new verse repository based on the configured database type.
 func NewVerseService() (verse.VerseService, error) {
-	dbConfig, err := config.GetDbConfig()
+	dbConfig, err := getDbConfigForVerse()
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +27,7 @@ func NewVerseService() (verse.VerseService, error) {
 
 	switch dbConfig.Type {
 	case config.DbTypePostgres:
-		repo, err = postgres.NewVerseRepository(dbConfig.PostgreSqlConfig)
+		repo, err = newVerseRepository(dbConfig.PostgreSqlConfig)
 		if err != nil {
 			return nil, err
 		}

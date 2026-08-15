@@ -23,7 +23,7 @@ var (
 // This allows for consistent and centralized error handling when converting internal errors
 // to appropriate HTTP responses in API handlers.
 var ErrorToStatusMap = map[error]int{
-	ErrUserNotFound:        http.StatusBadRequest,
+	ErrUserNotFound:        http.StatusNotFound,
 	ErrorInvalidVerse:      http.StatusBadRequest,
 	ErrorInvalidChapter:    http.StatusBadRequest,
 	ErrInvalidPassword:     http.StatusBadRequest,
