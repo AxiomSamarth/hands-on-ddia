@@ -1,7 +1,7 @@
 # Hands-on DDIA (Designing Data-Intensive Applications)
 
 [![Unit Tests](https://github.com/AxiomSamarth/hands-on-ddia/actions/workflows/unit-tests.yml/badge.svg?branch=main)](https://github.com/AxiomSamarth/hands-on-ddia/actions/workflows/unit-tests.yml)
-[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/AxiomSamarth/hands-on-ddia/main/.github/badges/coverage.json)](https://github.com/AxiomSamarth/hands-on-ddia/actions/workflows/unit-tests.yml)
+[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/AxiomSamarth/hands-on-ddia/badges/.github/badges/coverage.json)](https://github.com/AxiomSamarth/hands-on-ddia/actions/workflows/unit-tests.yml)
 
 This repository is a hands-on project inspired by the concepts from Designing Data-Intensive Applications. The aim is to build a complete application from scratch to explore and apply key software engineering principles and system design patterns.
 

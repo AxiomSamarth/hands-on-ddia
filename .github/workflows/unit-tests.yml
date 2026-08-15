@@ -40,8 +40,21 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           color="red"
-          awk -v c="$TOTAL_COVERAGE" 'BEGIN { if (c+0 >= 95) exit 0; exit 1 }' || color="orange"
-          awk -v c="$TOTAL_COVERAGE" 'BEGIN { if (c+0 >= 98) exit 0; exit 1 }' && color="brightgreen"
+          if awk -v c="$TOTAL_COVERAGE" 'BEGIN { exit (c+0 >= 95) ? 0 : 1 }'; then color="orange"; fi
+          if awk -v c="$TOTAL_COVERAGE" 'BEGIN { exit (c+0 >= 98) ? 0 : 1 }'; then color="brightgreen"; fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Switch to badges branch, creating an orphan if it doesn't exist yet
+          if git ls-remote --exit-code --heads origin badges; then
+            git fetch origin badges
+            git checkout badges
+          else
+            git checkout --orphan badges
+            git rm -rf . --quiet
+          fi
+
           mkdir -p .github/badges
           cat > .github/badges/coverage.json <<EOF
           {
@@ -52,15 +65,10 @@ jobs:
           }
           EOF
 
-      - name: Commit coverage badge data
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          if git diff --quiet .github/badges/coverage.json; then
-            echo "No coverage badge changes to commit."
+          git add .github/badges/coverage.json
+          if git diff --cached --quiet; then
+            echo "No coverage badge changes."
             exit 0
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/badges/coverage.json
           git commit -m "chore(ci): update coverage badge data"
-          git push
+          git push origin badges
