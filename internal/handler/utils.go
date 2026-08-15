@@ -10,6 +10,13 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+var (
+	parseToken = jwt.Parse
+	jwtSecretValue = func() string {
+		return os.Getenv("JWT_SECRET_KEY")
+	}
+)
+
 func writeError(w http.ResponseWriter, status int, msg string) {
 	resp := SignupResponse{
 		Error: &ApiError{Message: msg},
@@ -34,12 +41,12 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			tokenStr = after
 		}
 
-		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		token, err := parseToken(tokenStr, func(token *jwt.Token) (interface{}, error) {
 			// Ensure the token's signing method matches
 			if token.Method != jwt.SigningMethodHS256 {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
-			return []byte(os.Getenv("JWT_SECRET_KEY")), nil
+			return []byte(jwtSecretValue()), nil
 		})
 
 		if err != nil || !token.Valid {

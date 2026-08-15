@@ -20,6 +20,7 @@ var (
 
 var (
 	listenAndServe = (*http.Server).ListenAndServe
+	shutdownServer = (*http.Server).Shutdown
 )
 
 // Start starts the new HTTP server registered with routes and handler.
@@ -56,7 +57,7 @@ func Start() error {
 			logger.Log.Info("HTTP server stopped serving new connections")
 			return nil
 		case <-sigChan:
-			if err := server.Shutdown(shutdownCtx); err != nil {
+			if err := shutdownServer(server, shutdownCtx); err != nil {
 				return errors.New("HTTP server shutdown error: " + err.Error())
 			}
 			logger.Log.Info("HTTP server shutdown gracefully.")

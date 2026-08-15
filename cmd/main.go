@@ -7,26 +7,33 @@ import (
 	"github.com/AxiomSamarth/hands-on-ddia/internal/server"
 )
 
+var (
+	configInit = config.Init
+	dbInit     = db.Init
+	appInit    = app.Init
+	startServer = server.Start
+)
+
 func main() {
 	if err := initialize(); err != nil {
 		panic(err)
 	}
 
-	if err := server.Start(); err != nil {
+	if err := startServer(); err != nil {
 		panic(err)
 	}
 }
 
 func initialize() error {
-	if err := config.Init(); err != nil {
+	if err := configInit(); err != nil {
 		return err
 	}
 
-	if err := db.Init(); err != nil {
+	if err := dbInit(); err != nil {
 		return err
 	}
 
-	if err := app.Init(); err != nil {
+	if err := appInit(); err != nil {
 		return err
 	}
 	return nil

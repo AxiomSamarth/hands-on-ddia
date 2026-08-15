@@ -1,0 +1,8 @@
+appConfig:
+  env: production
+  host: localhost
+  port: 9090
+  loglevel: debug
+dbConfig:
+  type: mongodb
+  # Missing mysqlConfig section intentionally

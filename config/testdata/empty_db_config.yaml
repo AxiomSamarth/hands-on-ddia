@@ -1,0 +1,7 @@
+configs:
+  appConfig:
+    env: production
+    host: localhost
+    port: 9090
+    loglevel: debug
+  # Missing dbConfig section intentionally

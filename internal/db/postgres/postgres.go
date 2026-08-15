@@ -16,6 +16,12 @@ type dbClient struct {
 
 var db = dbClient{}
 
+var (
+	getDbConfig = config.GetDbConfig
+	openPostgres = postgres.Open
+	openGorm = gorm.Open
+)
+
 // GetDBClient returns the GORM based Postgres DB Client
 // and returns an error if uninitialized.
 func GetDBClient() (*gorm.DB, error) {
@@ -28,7 +34,7 @@ func GetDBClient() (*gorm.DB, error) {
 func Init() error {
 	var host string
 
-	dbConfig, err := config.GetDbConfig()
+	dbConfig, err := getDbConfig()
 	if err != nil {
 		return err
 	}
@@ -43,7 +49,7 @@ func Init() error {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
 		host, dbConfig.User, dbConfig.Password, psqlConfig.DBName, psqlConfig.Port)
 
-	db.db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db.db, err = openGorm(openPostgres(dsn), &gorm.Config{})
 	if err != nil {
 		return err
 	}

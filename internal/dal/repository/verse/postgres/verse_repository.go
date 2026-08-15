@@ -17,11 +17,21 @@ type VerseRepository struct {
 	dbClient *gorm.DB
 }
 
+var (
+	getDBClient = postgres.GetDBClient
+	getAllVerses = func(dbClient *gorm.DB, chapterNumber int, verses *[]psqlversemodel.Verse) error {
+		return dbClient.Preload("Chapter").Where("chapter_number = ?", chapterNumber).Find(verses).Error
+	}
+	getVerse = func(dbClient *gorm.DB, chapterNumber, verseNumber int, verses *[]psqlversemodel.Verse) error {
+		return dbClient.Preload("Chapter").Where("chapter_number = ? AND verse_number = ?", chapterNumber, verseNumber).First(verses).Error
+	}
+)
+
 // NewVerseRepository instantiates and returns a new verse repository implemented
 // for Postgres database.
 func NewVerseRepository(dbConfig config.PostgreSqlConfig) (verse.VerseRepository, error) {
 	verseRepository := &VerseRepository{}
-	dbClient, err := postgres.GetDBClient()
+	dbClient, err := getDBClient()
 	if err != nil {
 		return nil, err
 	}
@@ -33,12 +43,8 @@ func NewVerseRepository(dbConfig config.PostgreSqlConfig) (verse.VerseRepository
 // Returns error if the chapter number is invalid.
 func (v *VerseRepository) GetAllVerses(chapterNumber int) (*versemodel.Chapter, error) {
 	verses := []psqlversemodel.Verse{}
-	result := v.dbClient.
-		Preload("Chapter").
-		Where("chapter_number = ?", chapterNumber).
-		Find(&verses)
-	if result.Error != nil {
-		return nil, result.Error
+	if err := getAllVerses(v.dbClient, chapterNumber, &verses); err != nil {
+		return nil, err
 	}
 
 	if len(verses) == 0 {
@@ -53,12 +59,8 @@ func (v *VerseRepository) GetAllVerses(chapterNumber int) (*versemodel.Chapter, 
 // Returns error if the chapter number or verse number is invalid.
 func (v *VerseRepository) GetVerse(chapterNumber, verseNumber int) (*versemodel.Chapter, error) {
 	verses := []psqlversemodel.Verse{}
-	result := v.dbClient.
-		Preload("Chapter").
-		Where("chapter_number = ? AND verse_number = ?", chapterNumber, verseNumber).
-		First(&verses)
-	if result.Error != nil {
-		return nil, result.Error
+	if err := getVerse(v.dbClient, chapterNumber, verseNumber, &verses); err != nil {
+		return nil, err
 	}
 	return psqlversemodel.ToObject(verses), nil
 }

@@ -6,6 +6,16 @@ import (
 	"github.com/AxiomSamarth/hands-on-ddia/internal/dal/service/verse"
 )
 
+var (
+	// newUserService is a function that creates a new instance of UserService.
+	// It is defined as a variable to allow for easy mocking during tests.
+	newUserService = factory.NewUserService
+
+	// newVerseService is a function that creates a new instance of VerseService.
+	// It is defined as a variable to allow for easy mocking during tests.
+	newVerseService = factory.NewVerseService
+)
+
 // gitaAppDriver acts as the central application layer coordinator.
 // It wires together data access logic (DAL) with domain-level services,
 // and exposes high-level operations used by API handlers.
@@ -19,12 +29,12 @@ var gd *gitaAppDriver
 func Init() error {
 	gd = &gitaAppDriver{}
 
-	userSvc, err := factory.NewUserService()
+	userSvc, err := newUserService()
 	if err != nil {
 		return err
 	}
 
-	verseSvc, err := factory.NewVerseService()
+	verseSvc, err := newVerseService()
 	if err != nil {
 		return err
 	}

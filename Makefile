@@ -18,7 +18,8 @@ all: test build load deploy
 test:
 	@echo "Running unit tests with coverage..."
 	@echo "==================================="
-	go test -v -cover ./... -coverprofile=coverage.out
+	go test -v -cover ./... -coverprofile=coverage.out 
+	go tool cover -html coverage.out -o coverage.html
 	@echo "\nDetailed coverage by package:"
 	@echo "==================================="
 	go tool cover -func=coverage.out

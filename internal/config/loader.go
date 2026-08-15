@@ -58,14 +58,10 @@ func load() error {
 // It ensures the configuration is loaded before accessing it.
 // If the AppConfig section is missing in the loaded config, it returns an error.
 func GetAppConfig() (AppConfig, error) {
-	if isEmptyConfig(loadedConfig) {
+	if isEmptyConfig(loadedConfig.AppConfig) {
 		if err := load(); err != nil {
 			return AppConfig{}, fmt.Errorf("error loading config file: %w", err)
 		}
-	}
-
-	if isEmptyConfig(loadedConfig.AppConfig) {
-		return AppConfig{}, fmt.Errorf("app config is empty")
 	}
 	return loadedConfig.AppConfig, nil
 }
@@ -74,14 +70,10 @@ func GetAppConfig() (AppConfig, error) {
 // It ensured the configuration is loaded before accessing it.
 // If the DbConfig section is missing in the loaded config, it returns an error.
 func GetDbConfig() (DbConfig, error) {
-	if isEmptyConfig(loadedConfig) {
+	if isEmptyConfig(loadedConfig.DbConfig) {
 		if err := load(); err != nil {
 			return DbConfig{}, fmt.Errorf("error loading config file: %w", err)
 		}
-	}
-
-	if isEmptyConfig(loadedConfig.DbConfig) {
-		return DbConfig{}, fmt.Errorf("database config is empty")
 	}
 	return loadedConfig.DbConfig, nil
 }
@@ -96,10 +88,6 @@ func newConfig() config {
 }
 
 func validate() error {
-	if isEmptyConfig(loadedConfig) {
-		return fmt.Errorf("config is empty")
-	}
-
 	errs := []error{}
 
 	if isEmptyConfig(loadedConfig.AppConfig) {
@@ -108,19 +96,19 @@ func validate() error {
 
 	if isEmptyConfig(loadedConfig.DbConfig) {
 		errs = append(errs, fmt.Errorf("DbConfig is empty"))
-	}
+	} else {
+		dbConfig := &loadedConfig.DbConfig
 
-	DbConfig := loadedConfig.DbConfig
-
-	switch DbConfig.Type {
-	case DbTypePostgres:
-		errs = append(errs, DbConfig.validatePostgresSqlConfig())
-	case DbTypeMySql:
-		errs = append(errs, DbConfig.validateMySqlConfig())
-	case DbTypeMongoDb:
-		errs = append(errs, DbConfig.validateMongoDbConfig())
-	default:
-		errs = append(errs, fmt.Errorf("invalid database type: %s", DbConfig.Type))
+		switch dbConfig.Type {
+		case DbTypePostgres:
+			errs = append(errs, dbConfig.validatePostgresSqlConfig())
+		case DbTypeMySql:
+			errs = append(errs, dbConfig.validateMySqlConfig())
+		case DbTypeMongoDb:
+			errs = append(errs, dbConfig.validateMongoDbConfig())
+		default:
+			errs = append(errs, fmt.Errorf("invalid database type: %s", dbConfig.Type))
+		}
 	}
 	return errors.Join(errs...)
 }

@@ -1,0 +1,8 @@
+# This file is meant for negative test cases.
+dbConfig:
+  type: postgresql
+  postgreSqlConfig:
+    host: localhost
+    namespace: "" # set the namespace to "" for local/dev environment
+    port: 5432
+    dbName: gitadb

@@ -79,10 +79,22 @@ type PostgreSqlConfig struct {
 }
 
 // MongoDbConfig contains connection details for a MongoDB database instance.
-type MongoDbConfig struct{}
+type MongoDbConfig struct{
+	// Host address of the MongoDB server.
+	Host string `yaml:"host"`
+
+	// Port number for MongoDb.
+	Port int `yaml:"port"`
+}
 
 // MySqlConfig contains connection details for a MySQL database instance.
-type MySqlConfig struct{}
+type MySqlConfig struct{
+	// Host address of the MySQL server.
+	Host string `yaml:"host"`
+
+	// Port number for MySQL.
+	Port int `yaml:"port"`
+}
 
 type DBCredentials struct {
 	// Name of the user of the PostgreSQL database.

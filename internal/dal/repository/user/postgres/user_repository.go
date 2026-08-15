@@ -17,6 +17,16 @@ type UserRepository struct {
 	dbClient *gorm.DB
 }
 
+var (
+	getDBClient = postgres.GetDBClient
+	findByEmail = func(dbClient *gorm.DB, emailId string, user *psqlusermodel.User) error {
+		return dbClient.Where("email_id = ?", emailId).First(user).Error
+	}
+	insertUser = func(dbClient *gorm.DB, user *psqlusermodel.User) error {
+		return dbClient.Create(user).Error
+	}
+)
+
 // Delete implements user.UserRepository.
 func (u *UserRepository) Delete(user *usermodel.User) error {
 	panic("unimplemented")
@@ -25,9 +35,8 @@ func (u *UserRepository) Delete(user *usermodel.User) error {
 // FindByEmail implements user.UserRepository.
 func (u *UserRepository) FindByEmail(emailId string) (*usermodel.User, error) {
 	user := &psqlusermodel.User{}
-	result := u.dbClient.Where("email_id = ?", emailId).First(user)
-	if result.Error != nil {
-		return nil, result.Error
+	if err := findByEmail(u.dbClient, emailId, user); err != nil {
+		return nil, err
 	}
 	return psqlusermodel.ToObject(user), nil
 }
@@ -35,9 +44,8 @@ func (u *UserRepository) FindByEmail(emailId string) (*usermodel.User, error) {
 // Insert implements user.UserRepository.
 func (u *UserRepository) Insert(user *usermodel.User) error {
 	userEntity := psqlusermodel.ToEntity(*user)
-	result := u.dbClient.Create(userEntity)
-	if result.Error != nil {
-		return result.Error
+	if err := insertUser(u.dbClient, userEntity); err != nil {
+		return err
 	}
 	return nil
 }
@@ -46,7 +54,7 @@ func (u *UserRepository) Insert(user *usermodel.User) error {
 // for Postgres database.
 func NewUserRepository(dbConfig config.PostgreSqlConfig) (user.UserRepository, error) {
 	userRepository := &UserRepository{}
-	dbClient, err := postgres.GetDBClient()
+	dbClient, err := getDBClient()
 	if err != nil {
 		return nil, err
 	}
